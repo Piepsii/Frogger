@@ -3,6 +3,7 @@
 #include "cmath"
 #include "GameObject.h"
 #include "SFML/Graphics.hpp"
+#include "config.h"
 
 class Frog :
     private GameObject

@@ -11,7 +11,7 @@ Game::Game(unsigned int &screenWidth, unsigned int &screenHeight, const char* &t
 	m_menuText.setString("PRESS SPACE TO START");
 	m_menuText.setPosition(150, 400);
 	m_inputManager = &_inputManager;
-	m_safetyStripe1 = sf::RectangleShape(sf::Vector2f(screenWidth, 32.0f));
+	m_safetyStripe1 = sf::RectangleShape(sf::Vector2f(static_cast<float>(screenWidth), 32.0f));
 	m_safetyStripe1.setPosition(0.0f, 14 * 32.0f);
 	m_safetyStripe1.setFillColor(sf::Color::Magenta);
 	m_safetyStripe2 = sf::RectangleShape(m_safetyStripe1);
