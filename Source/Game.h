@@ -20,6 +20,7 @@ public:
 	void onKeyPressed(sf::Keyboard::Key& _key);
 	void onKeyReleased(sf::Keyboard::Key& _key);
 	void setUpLevel(int _level);
+	void checkCollision();
 
 private:
 	enum class GameState
@@ -30,11 +31,11 @@ private:
 	GameState m_gameState;
 	InputManager* m_inputManager;
 	Frog m_frog;
-	std::vector<Car> m_cars;
+	std::vector<Car*> m_cars;
 
 	sf::Font m_font;
 	sf::Text m_menuText;
-	int m_score, m_gameTimer, m_levelTimer;
-	sf::RectangleShape m_safetyStripe1, m_safetyStripe2;
+	int m_score, m_gameTimer, m_levelTimer, m_playerLives;
+	sf::RectangleShape m_safetyStripe1, m_safetyStripe2, m_water;
 
 };

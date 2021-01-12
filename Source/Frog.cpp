@@ -2,7 +2,6 @@
 
 Frog::Frog()
 {
-	m_texture = new sf::Texture();
 	m_texture->loadFromFile("../Assets/frog.png");
 	m_sprite.setTexture(*m_texture);
 	m_sprite.setOrigin(16.0f, 16.0f);
@@ -12,6 +11,8 @@ Frog::Frog()
 	m_destinationPosition = sf::Vector2f(7 * 32.0f + 16.0f, 14 * 32.0f + 16.0f);
 	m_direction = sf::Vector2f(0.0f, 0.0f);
 	m_velocity = 0.0f;
+	m_collisionBounds = sf::RectangleShape(sf::Vector2f(16.0f, 16.0f));
+	m_collisionBounds.setFillColor(sf::Color::Red);
 }
 
 Frog::~Frog()
@@ -21,6 +22,7 @@ Frog::~Frog()
 void Frog::Update()
 {
 	m_currentPosition = m_sprite.getPosition();
+	m_collisionBounds.setPosition(m_currentPosition.x - 8.0f, m_currentPosition.y - 8.0f);
 	if (m_destinationPosition.x > 0 && m_destinationPosition.x < config::WIDTH && m_destinationPosition.y > 0 && m_destinationPosition.y < config::HEIGHT)
 	{
 		m_direction = m_destinationPosition - m_currentPosition;
@@ -77,4 +79,28 @@ void Frog::jump(Direction _direction)
 bool Frog::isJumping()
 {
 	return m_isJumping;
+}
+
+void Frog::handleInput(InputManager* _inputManager)
+{
+	if (_inputManager->isKeyPressed(sf::Keyboard::Up) && !isJumping())
+		jump(GameObject::Direction::NORTH);
+	if (_inputManager->isKeyPressed(sf::Keyboard::Right) && !isJumping())
+		jump(GameObject::Direction::EAST);
+	if (_inputManager->isKeyPressed(sf::Keyboard::Down) && !isJumping())
+		jump(GameObject::Direction::SOUTH);
+	if (_inputManager->isKeyPressed(sf::Keyboard::Left) && !isJumping())
+		jump(GameObject::Direction::WEST);
+
+}
+
+void Frog::resetPlayer()
+{
+	m_sprite.setPosition(7 * 32.0f + 16.0f, 14 * 32.0f + 16.0f);
+	m_destinationPosition = m_sprite.getPosition();
+}
+
+sf::RectangleShape Frog::getCollisionBounds()
+{
+	return m_collisionBounds;
 }

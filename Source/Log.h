@@ -1,7 +1,8 @@
 #pragma once
-#include "Obstacle.h"
+#include "GameObject.h"
+
 class Log :
-    public Obstacle
+    public GameObject
 {
 public:
     Log(int _line, float _x, Direction _direction, int _size);

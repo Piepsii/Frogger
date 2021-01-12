@@ -8,4 +8,5 @@ GameObject::GameObject()
 
 GameObject::~GameObject()
 {
+	delete m_texture;
 }

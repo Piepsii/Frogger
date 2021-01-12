@@ -5,7 +5,7 @@ class GameObject
 {
 public:
     GameObject();
-    ~GameObject();
+    virtual ~GameObject();
     virtual void Update() = 0;
     virtual void Draw(sf::RenderWindow& _window) = 0;
     enum class Direction
