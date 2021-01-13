@@ -8,8 +8,9 @@ public:
 	Goal(float _x);
 	void Update();
 	void setCompleted(bool _param);
+	bool wasCompleted();
 
 private:
-	bool m_completed;
+	bool m_isCompleted, m_wasCompleted;
 };
 

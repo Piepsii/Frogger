@@ -7,6 +7,7 @@
 #include "Car.h"
 #include "Log.h"
 #include "Goal.h"
+#include "GUI.h"
 
 class Game
 {
@@ -21,8 +22,12 @@ public:
 	void handleInput();
 	void onKeyPressed(sf::Keyboard::Key& _key);
 	void onKeyReleased(sf::Keyboard::Key& _key);
-	void setUpLevel(int _level);
+	void resetLevel(int _seed);
 	void checkCollision();
+	void reduceLives();
+	void checkWinCondition();
+	void deleteArrays();
+	void updateTimer();
 
 private:
 	enum class GameState
@@ -37,12 +42,14 @@ private:
 	std::vector<Goal*> m_goals;
 	std::vector<Car*> m_cars;
 	std::vector<Log*> m_logs;
+	GUI* m_gui;
 
 	sf::Font m_font;
 	sf::Text m_menuText;
-	int m_score, m_gameTimer, m_levelTimer, m_playerLives;
+	int m_score, m_gameTimer, m_levelTimer, m_playerLives, m_completedGoals;
 	sf::RectangleShape m_safetyStripe1, m_safetyStripe2, m_water;
 	sf::RectangleShape m_hedge;
 	std::vector<sf::RectangleShape*> m_goalWaterShapes;
+	bool m_won, m_lost;
 
 };
