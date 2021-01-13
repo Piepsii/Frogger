@@ -1,7 +1,7 @@
 #include "Game.h"
 
 Game::Game(unsigned int &screenWidth, unsigned int &screenHeight, const char* &title, InputManager& _inputManager)
-	: m_gameState(GameState::STARTMENU), m_score(0), m_gameTimer(0), m_levelTimer(3600), m_playerLives(3), m_completedGoals(0), m_won(false), m_lost(false)
+	: m_gameState(GameState::STARTMENU), m_score(0), m_gameTimer(0), m_levelTimer(7200), m_playerLives(3), m_completedGoals(0), m_won(false), m_lost(false)
 {
 	screenWidth = 640;
 	screenHeight = 512;

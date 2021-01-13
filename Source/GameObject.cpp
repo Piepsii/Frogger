@@ -18,10 +18,10 @@ void GameObject::Update()
 	switch (m_direction)
 	{
 	case Direction::EAST:
-		m_directionVector.x = -0.5f;
+		m_directionVector.x = 0.5f;
 		break;
 	case Direction::WEST:
-		m_directionVector.x = 0.5f;
+		m_directionVector.x = -0.5f;
 		break;
 	}
 

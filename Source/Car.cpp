@@ -11,6 +11,8 @@ Car::Car(int _line, float _x, Direction _direction, int _size)
 	m_sprite.setOrigin(m_sprite.getGlobalBounds().width / 2, m_sprite.getGlobalBounds().height / 2);
 	m_sprite.setPosition(_x, _line * 32.0f + 16.0f);
 	m_direction = _direction;
+	if (m_direction == GameObject::Direction::EAST)
+		m_sprite.rotate(180.0f);
 }
 
 Car::~Car()
