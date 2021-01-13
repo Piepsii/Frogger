@@ -6,8 +6,8 @@ class GameObject
 public:
     GameObject();
     virtual ~GameObject();
-    virtual void Update() = 0;
-    virtual void Draw(sf::RenderWindow& _window) = 0;
+    virtual void Update();
+    virtual void Draw(sf::RenderWindow& _window);
     enum class Direction
     {
         NORTH,
@@ -19,5 +19,8 @@ public:
     sf::Texture* m_texture;
     sf::Sprite m_sprite;
     Direction m_direction;
+    sf::Vector2f m_directionVector;
+
+    sf::Vector2f getDirectionVector();
 };
 

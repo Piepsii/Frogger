@@ -7,12 +7,12 @@ Frog::Frog()
 	m_sprite.setOrigin(16.0f, 16.0f);
 	m_sprite.setPosition(7 * 32.0f + 16.0f, 14 * 32.0f + 16.0f);
 	m_isJumping = false;
-	m_currentPosition = sf::Vector2f(0.0f, 0.0f);
+	m_isOnLog = false;
 	m_destinationPosition = sf::Vector2f(7 * 32.0f + 16.0f, 14 * 32.0f + 16.0f);
 	m_direction = sf::Vector2f(0.0f, 0.0f);
 	m_velocity = 0.0f;
-	m_collisionBounds = sf::RectangleShape(sf::Vector2f(16.0f, 16.0f));
-	m_collisionBounds.setFillColor(sf::Color::Red);
+	m_collisionRect = sf::RectangleShape(sf::Vector2f(16.0f, 16.0f));
+	m_collisionRect.setFillColor(sf::Color::Red);
 }
 
 Frog::~Frog()
@@ -21,13 +21,18 @@ Frog::~Frog()
 
 void Frog::Update()
 {
-	m_currentPosition = m_sprite.getPosition();
-	m_collisionBounds.setPosition(m_currentPosition.x - 8.0f, m_currentPosition.y - 8.0f);
-	if (m_destinationPosition.x > 0 && m_destinationPosition.x < config::WIDTH && m_destinationPosition.y > 0 && m_destinationPosition.y < config::HEIGHT)
+	//floating
+	if(m_isOnLog && !m_isJumping)
+		m_sprite.move(m_floatDirection);
+	m_floatDirection.x = 0.0f;
+
+	//movement
+	m_collisionRect.setPosition(m_sprite.getPosition().x - 8.0f, m_sprite.getPosition().y - 8.0f);
+	if (m_destinationPosition.x > 0 && m_destinationPosition.x < config::WIDTH && m_destinationPosition.y > 0 && m_destinationPosition.y < config::HEIGHT && m_isJumping)
 	{
-		m_direction = m_destinationPosition - m_currentPosition;
+		m_direction = m_destinationPosition - m_sprite.getPosition();
 		m_velocity = sqrt(powf(m_direction.x, 2.0f) + powf(m_direction.y, 2.0f));
-		if (m_velocity < 0.5f)
+		if (m_velocity < 0.7f)
 		{
 			m_isJumping = false;
 			m_sprite.setPosition(m_destinationPosition);
@@ -42,11 +47,6 @@ void Frog::Update()
 	{
 		m_destinationPosition = m_sprite.getPosition();
 	}
-}
-
-void Frog::Draw(sf::RenderWindow& _window)
-{
-	_window.draw(m_sprite);
 }
 
 void Frog::jump(Direction _direction)
@@ -100,7 +100,18 @@ void Frog::resetPlayer()
 	m_destinationPosition = m_sprite.getPosition();
 }
 
-sf::RectangleShape Frog::getCollisionBounds()
+sf::RectangleShape Frog::getCollisionRect()
 {
-	return m_collisionBounds;
+	return m_collisionRect;
+}
+
+void Frog::setOnLog(bool _param, sf::Vector2f _directionVector)
+{
+	m_isOnLog = _param;
+	m_floatDirection = _directionVector;
+}
+
+bool Frog::isOnLog()
+{
+	return m_isOnLog;
 }

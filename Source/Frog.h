@@ -13,17 +13,18 @@ public:
     Frog();
     ~Frog();
     void Update();
-    void Draw(sf::RenderWindow& _window);
     void jump(Direction _direction);
     bool isJumping();
     void handleInput(InputManager* _inputManager);
     void resetPlayer();
-    sf::RectangleShape getCollisionBounds();
+    sf::RectangleShape getCollisionRect();
+    void setOnLog(bool _param, sf::Vector2f _direction);
+    bool isOnLog();
 
 private:
-    bool m_isJumping;
-    sf::Vector2f m_currentPosition, m_destinationPosition, m_direction;
+    bool m_isJumping, m_isOnLog;
+    sf::Vector2f m_destinationPosition, m_direction, m_floatDirection;
     float m_velocity;
-    sf::RectangleShape m_collisionBounds;
+    sf::RectangleShape m_collisionRect;
 };
 
