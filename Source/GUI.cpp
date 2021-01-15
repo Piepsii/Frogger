@@ -29,8 +29,9 @@ GUI::~GUI()
 	delete texture;
 }
 
-void GUI::Update()
+void GUI::Update(int _score)
 {
+	m_score.setString(std::to_string(_score));
 }
 
 void GUI::Draw(sf::RenderWindow& _window)

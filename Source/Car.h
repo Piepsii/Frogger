@@ -4,7 +4,7 @@ class Car :
     public GameObject
 {
 public:
-    Car(int _line, float _x, Direction _direction, int _size);
+    Car(int _line, float _x, Direction _direction, int _size, float _speed);
     ~Car();
 };
 

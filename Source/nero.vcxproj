@@ -158,6 +158,7 @@
     <ClCompile Include="GameObject.cpp" />
     <ClCompile Include="Goal.cpp" />
     <ClCompile Include="GUI.cpp" />
+    <ClCompile Include="HighScoreManager.cpp" />
     <ClCompile Include="InputManager.cpp" />
     <ClCompile Include="Log.cpp" />
     <ClCompile Include="main.cpp" />
@@ -171,6 +172,7 @@
     <ClInclude Include="GameObject.h" />
     <ClInclude Include="Goal.h" />
     <ClInclude Include="GUI.h" />
+    <ClInclude Include="HighScoreManager.h" />
     <ClInclude Include="InputManager.h" />
     <ClInclude Include="Log.h" />
     <ClInclude Include="ObjectManager.h" />

@@ -20,6 +20,7 @@ public:
     sf::Sprite m_sprite;
     Direction m_direction;
     sf::Vector2f m_directionVector;
+    float m_speed;
 
     sf::Vector2f getDirectionVector();
 };

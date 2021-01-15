@@ -13,6 +13,9 @@ Frog::Frog()
 	m_velocity = 0.0f;
 	m_collisionRect = sf::RectangleShape(sf::Vector2f(16.0f, 16.0f));
 	m_collisionRect.setFillColor(sf::Color::Red);
+	m_jumpBuffer.loadFromFile("../Assets/jump.wav");
+	m_jump.setBuffer(m_jumpBuffer);
+	m_jump.setVolume(15);
 }
 
 Frog::~Frog()
@@ -54,21 +57,25 @@ void Frog::jump(Direction _direction)
 	switch (_direction)
 	{
 	case Direction::NORTH:
+		m_jump.play();
 		m_isJumping = true;
 		m_sprite.setRotation(0.0f);
 		m_destinationPosition += sf::Vector2f(0.0f, -32.0f);
 		break;
 	case Direction::EAST:
+		m_jump.play();
 		m_isJumping = true;
 		m_sprite.setRotation(90.0f);
 		m_destinationPosition += sf::Vector2f(32.0f, 0.0f);
 		break;
 	case Direction::SOUTH:
+		m_jump.play();
 		m_isJumping = true;
 		m_sprite.setRotation(180.0f);
 		m_destinationPosition += sf::Vector2f(0.0f, 32.0f);
 		break;
 	case Direction::WEST:
+		m_jump.play();
 		m_isJumping = true;
 		m_sprite.setRotation(270.0f);
 		m_destinationPosition += sf::Vector2f(-32.0f, 0.0f);

@@ -18,17 +18,19 @@ int main(int argc, char** argv)
 
 	while (running)
 	{
-		sf::Event event;
+		sf::Event _event;
 		delta = clock.restart();
 		inputManager.Update();
-		while (window.pollEvent(event))
+		while (window.pollEvent(_event))
 		{
-			switch (event.type)
+			switch (_event.type)
 			{
 				case sf::Event::KeyPressed:
-					game->onKeyPressed(event.key.code); break;
+					game->onKeyPressed(_event.key.code); break;
 				case sf::Event::KeyReleased:
-					game->onKeyReleased(event.key.code); break;
+					game->onKeyReleased(_event.key.code); break;
+				case sf::Event::TextEntered:
+					game->textEntered(_event); break;
 				case sf::Event::EventType::Closed:
 					running = false; break;
 

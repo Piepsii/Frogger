@@ -6,7 +6,7 @@ class GUI
 public:
 	GUI();
 	~GUI();
-	void Update();
+	void Update(int _score);
 	void Draw(sf::RenderWindow& _window);
 	void reduceLives();
 	void setTime(int _tick);

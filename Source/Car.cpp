@@ -2,7 +2,7 @@
 #include <sstream>
 
 
-Car::Car(int _line, float _x, Direction _direction, int _size)
+Car::Car(int _line, float _x, Direction _direction, int _size, float _speed)
 {
 	std::stringstream ss;
 	ss << "../Assets/car" << _size << ".png";
@@ -13,6 +13,7 @@ Car::Car(int _line, float _x, Direction _direction, int _size)
 	m_direction = _direction;
 	if (m_direction == GameObject::Direction::EAST)
 		m_sprite.rotate(180.0f);
+	m_speed = _speed;
 }
 
 Car::~Car()

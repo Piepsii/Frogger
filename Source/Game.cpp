@@ -1,7 +1,19 @@
+// Paul Brandstetter DOD: 15.01.2021
 #include "Game.h"
 
 Game::Game(unsigned int &screenWidth, unsigned int &screenHeight, const char* &title, InputManager& _inputManager)
-	: m_gameState(GameState::STARTMENU), m_score(0), m_gameTimer(0), m_levelTimer(7200), m_playerLives(3), m_completedGoals(0), m_won(false), m_lost(false)
+	: m_gameState(GameState::STARTMENU),
+	m_score(0),
+	m_gameTimer(0),
+	m_playerLives(3),
+	m_completedGoals(0),
+	m_won(false),
+	m_lost(false),
+	m_highestPosition(INT_MAX),
+	m_positionScore(0),
+	m_collectiveScore(0),
+	m_maxTime(7200),
+	m_levelTimer(7200)
 {
 	screenWidth = 640;
 	screenHeight = 512;
@@ -22,14 +34,31 @@ Game::Game(unsigned int &screenWidth, unsigned int &screenHeight, const char* &t
 	m_water.setFillColor(sf::Color::Blue);
 	m_hedge = sf::RectangleShape(sf::Vector2f(static_cast<float>(config::WIDTH), 64.0f));
 	m_hedge.setFillColor(sf::Color::Green);
-	resetLevel(0);
+	
+	resetLevel(static_cast<unsigned int>(time(NULL)));
+
+	m_music.openFromFile("../Assets/The_Snake_Strut.wav");
+	m_music.play();
+	m_music.setVolume(30);
+	m_crashBuffer.loadFromFile("../Assets/crash.wav");
+	m_crash.setBuffer(m_crashBuffer);
+	m_crash.setVolume(30);
+	m_goalBuffer.loadFromFile("../Assets/goal.wav");
+	m_goal.setBuffer(m_goalBuffer);
+	m_goal.setVolume(30);
+	m_splashBuffer.loadFromFile("../Assets/splash.wav");
+	m_splash.setBuffer(m_splashBuffer);
+	m_splash.setVolume(30);
+
+	m_highScoreManager = new HighScoreManager();
+
 };
 
 Game::~Game()
 {
 	deleteArrays();
-	delete m_inputManager;
 	delete m_gui;
+	delete m_highScoreManager;
 }
 
 bool Game::Update(float deltaTime)
@@ -46,7 +75,9 @@ bool Game::Update(float deltaTime)
 			m_won = false;
 		}
 		if (m_lost)
+		{
 			m_gameState = GameState::ENDMENU;
+		}
 		m_frog.Update();
 		for (auto a = 0; a < m_cars.size(); a++)
 			m_cars.at(a)->Update();
@@ -61,11 +92,12 @@ bool Game::Update(float deltaTime)
 			m_goals.at(a)->Update();
 		}
 		updateTimer();
-		m_gui->Update();
+		m_collectiveScore = scoreByMoving() + scoreByTime();
+		m_gui->Update(m_score + m_collectiveScore);
 		break;
 	case GameState::ENDMENU:
-
-		break;
+		if (!m_highScoreManager->Update())
+			return false;
 	}
 	return true;
 }
@@ -76,6 +108,7 @@ void Game::Draw(sf::RenderWindow& _window)
 	{
 	case GameState::STARTMENU:
 		_window.draw(m_menuText);
+		m_highScoreManager->DrawHighScores(_window);
 		break;
 	case GameState::GAME:
 		_window.draw(m_safetyStripe1);
@@ -95,7 +128,7 @@ void Game::Draw(sf::RenderWindow& _window)
 		m_gui->Draw(_window);
 		break;
 	case GameState::ENDMENU:
-
+		m_highScoreManager->Draw(_window);
 		break;
 	}
 }
@@ -112,7 +145,6 @@ void Game::handleInput()
 		m_frog.handleInput(m_inputManager);
 		break;
 	case GameState::ENDMENU:
-
 		break;
 	}
 }
@@ -127,72 +159,44 @@ void Game::onKeyReleased(sf::Keyboard::Key& _key)
 	m_inputManager->setKey(_key, false);
 }
 
-void Game::resetLevel(int _seed)
+void Game::resetLevel(unsigned int _seed)
 {
 	//general
+	m_score += m_collectiveScore;
+	m_levelTimer = m_maxTime;
 	deleteArrays();
 	m_cars.clear();
 	m_logs.clear();
 	m_goals.clear();
 	m_goalWaterShapes.clear();
 	m_frog.resetPlayer();
+	m_completedGoals = 0;
+	m_highestPosition = INT_MAX;
+	srand(_seed);
 
-	//cars 1
-	m_cars.push_back(new Car(13, 0.0f	, GameObject::Direction::EAST, 1));
-	m_cars.push_back(new Car(13, 160.0f	, GameObject::Direction::EAST, 1));
-	m_cars.push_back(new Car(13, 320.0f	, GameObject::Direction::EAST, 1));
-	m_cars.push_back(new Car(13, 480.0f	, GameObject::Direction::EAST, 1));
-	//cars 2
-	m_cars.push_back(new Car(12, 0.0f	, GameObject::Direction::WEST, 1));
-	m_cars.push_back(new Car(12, 160.0f	, GameObject::Direction::WEST, 1));
-	m_cars.push_back(new Car(12, 320.0f	, GameObject::Direction::WEST, 1));
-	m_cars.push_back(new Car(12, 480.0f	, GameObject::Direction::WEST, 1));
-	//cars 3
-	m_cars.push_back(new Car(11, 0.0f	, GameObject::Direction::WEST, 1));
-	m_cars.push_back(new Car(11, 160.0f	, GameObject::Direction::WEST, 1));
-	m_cars.push_back(new Car(11, 320.0f	, GameObject::Direction::WEST, 1));
-	m_cars.push_back(new Car(11, 480.0f	, GameObject::Direction::WEST, 1));
-	//cars 4
-	m_cars.push_back(new Car(10, 0.0f	, GameObject::Direction::EAST, 2));
-	m_cars.push_back(new Car(10, 160.0f	, GameObject::Direction::EAST, 2));
-	m_cars.push_back(new Car(10, 320.0f	, GameObject::Direction::EAST, 2));
-	m_cars.push_back(new Car(10, 480.0f	, GameObject::Direction::EAST, 2));
-	//cars 5
-	m_cars.push_back(new Car(9, 0.0f, GameObject::Direction::WEST, 2));
-	m_cars.push_back(new Car(9, 160.0f, GameObject::Direction::WEST, 2));
-	m_cars.push_back(new Car(9, 320.0f, GameObject::Direction::WEST, 2));
-	m_cars.push_back(new Car(9, 480.0f, GameObject::Direction::WEST, 2));
-	
-	//logs 1
-	m_logs.push_back(new Log(7 , 0.0f	, GameObject::Direction::WEST, 1));
-	m_logs.push_back(new Log(7 , 160.0f	, GameObject::Direction::WEST, 3));
-	m_logs.push_back(new Log(7 , 320.0f	, GameObject::Direction::WEST, 2));
-	m_logs.push_back(new Log(7 , 480.0f	, GameObject::Direction::WEST, 3));
-	//logs 2
-	m_logs.push_back(new Log(6, 0.0f, GameObject::Direction::EAST, 3));
-	m_logs.push_back(new Log(6, 170.0f, GameObject::Direction::EAST, 2));
-	m_logs.push_back(new Log(6, 330.0f, GameObject::Direction::EAST, 1));
-	m_logs.push_back(new Log(6, 470.0f, GameObject::Direction::EAST, 1));
-	//logs 3
-	m_logs.push_back(new Log(5, 0.0f, GameObject::Direction::EAST, 2));
-	m_logs.push_back(new Log(5, 165.0f, GameObject::Direction::EAST, 1));
-	m_logs.push_back(new Log(5, 315.0f, GameObject::Direction::EAST, 3));
-	m_logs.push_back(new Log(5, 465.0f, GameObject::Direction::EAST, 3));
-	//logs 4
-	m_logs.push_back(new Log(4, 0.0f, GameObject::Direction::EAST, 2));
-	m_logs.push_back(new Log(4, 165.0f, GameObject::Direction::EAST, 1));
-	m_logs.push_back(new Log(4, 315.0f, GameObject::Direction::EAST, 3));
-	m_logs.push_back(new Log(4, 465.0f, GameObject::Direction::EAST, 3));
-	//logs 5
-	m_logs.push_back(new Log(3, 0.0f, GameObject::Direction::EAST, 2));
-	m_logs.push_back(new Log(3, 165.0f, GameObject::Direction::EAST, 1));
-	m_logs.push_back(new Log(3, 315.0f, GameObject::Direction::EAST, 3));
-	m_logs.push_back(new Log(3, 465.0f, GameObject::Direction::EAST, 3));
-	//logs 6
-	m_logs.push_back(new Log(2, 0.0f, GameObject::Direction::WEST, 2));
-	m_logs.push_back(new Log(2, 165.0f, GameObject::Direction::WEST, 1));
-	m_logs.push_back(new Log(2, 315.0f, GameObject::Direction::WEST, 3));
-	m_logs.push_back(new Log(2, 465.0f, GameObject::Direction::WEST, 3));
+	//cars
+	for (int i = 0; i < 5; i++)
+	{
+		GameObject::Direction direction = static_cast<GameObject::Direction>(rand() % 2 == 0 ? 1 : 3);
+		int size = rand() % 2 + 1;
+		float speed = (rand() / RAND_MAX) * 2 + 0.6f;
+		m_cars.push_back(new Car(13 - i, 0.0f + rand() % 40 - 20.0f, direction, size, speed));
+		m_cars.push_back(new Car(13 - i, 160.0f + rand() % 40 - 20.0f, direction, size, speed));
+		m_cars.push_back(new Car(13 - i, 320.0f + rand() % 40 - 20.0f, direction, size, speed));
+		m_cars.push_back(new Car(13 - i, 480.0f + rand() % 40 - 20.0f, direction, size, speed));
+	}
+
+	//logs
+	for (int i = 0; i < 6; i++)
+	{
+		GameObject::Direction direction = static_cast<GameObject::Direction>(rand() % 2 == 0 ? 1 : 3);
+		int size = rand() % 3 + 1;
+		float speed = (rand() / RAND_MAX) * 2 + 0.6f;
+		m_logs.push_back(new Log(7 - i, 0.0f + rand() % 40 - 20.0f, direction, size, speed));
+		m_logs.push_back(new Log(7 - i, 160.0f + rand() % 40 - 20.0f, direction, size, speed));
+		m_logs.push_back(new Log(7 - i, 320.0f + rand() % 40 - 20.0f, direction, size, speed));
+		m_logs.push_back(new Log(7 - i, 480.0f + rand() % 40 - 20.0f, direction, size, speed));
+	}
 
 	//goals
 	m_goals.push_back(new Goal(config::WIDTH / 4.0f));
@@ -215,6 +219,7 @@ void Game::checkCollision()
 	{
 		if (car->m_sprite.getGlobalBounds().intersects(m_frog.getCollisionRect().getGlobalBounds()))
 		{
+			m_crash.play();
 			reduceLives();
 		}
 	}
@@ -242,6 +247,7 @@ void Game::checkCollision()
 		&& !m_frog.isJumping()
 		&& !m_frog.isOnLog())
 	{
+		m_splash.play();
 		reduceLives();
 	}
 
@@ -250,6 +256,9 @@ void Game::checkCollision()
 	{
 		if (goal->m_sprite.getGlobalBounds().intersects(m_frog.getCollisionRect().getGlobalBounds()))
 		{
+			m_goal.play();
+			m_score += m_positionScore;
+			m_highestPosition = INT_MAX;
 			goal->setCompleted(true);
 			m_frog.resetPlayer();
 		}
@@ -266,9 +275,12 @@ void Game::reduceLives()
 void Game::checkWinCondition()
 {
 	if (m_completedGoals >= m_goals.size())
-		m_won = true;;
+		m_won = true;
 	if (m_playerLives <= 0)
+	{
 		m_lost = true;
+		m_highScoreManager->setScore(m_score + m_collectiveScore);
+	}
 }
 
 void Game::deleteArrays()
@@ -291,4 +303,23 @@ void Game::updateTimer()
 	if (m_levelTimer < 0)
 		m_lost = true;
 }
+
+int Game::scoreByMoving()
+{
+	if(m_highestPosition > m_frog.m_sprite.getPosition().y)
+		m_highestPosition = m_frog.m_sprite.getPosition().y;
+	return m_positionScore = config::HEIGHT - m_highestPosition;
+}
+
+int Game::scoreByTime()
+{
+	return m_timeScore = m_levelTimer / 12;
+}
+
+void Game::textEntered(sf::Event& _event)
+{
+	if(m_gameState == GameState::ENDMENU)
+		m_highScoreManager->handleInput(_event);
+}
+
 
